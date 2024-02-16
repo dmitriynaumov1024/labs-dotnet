@@ -1,0 +1,13 @@
+input: a pbm (P1) file with glyphs
+input: a short string 
+input: a color
+
+raster glyph is basically a ((2d bit array), (color))
+voxel is basically a ((x, y, z), (color)) 
+vertex buffer is basically a float[]
+
+(text, color) -> RasterGlyph[] -> Voxel[] -> float[] 
+
+convert that file to dictionary of char to raster glyph
+for each 
+take raster glyphs 
