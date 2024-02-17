@@ -8,13 +8,17 @@ public static class Program
 {
     private static void Main()
     {
-        var nativeWindowSettings = new NativeWindowSettings() {
+        var myConfig = new MyConfig();
+
+        var nativeSettings = new NativeWindowSettings() {
             ClientSize = new Vector2i(800, 600),
             Title = "Lab 10 by Dmytro Naumov",
             Flags = ContextFlags.ForwardCompatible
         };
 
-        using (var window = new MainWindow(GameWindowSettings.Default, nativeWindowSettings)) {
+        var gwSettings = GameWindowSettings.Default;
+
+        using (var window = new MainWindow(gwSettings, nativeSettings, myConfig)) {
             window.Run();
         }
         Console.WriteLine();

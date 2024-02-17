@@ -10,6 +10,7 @@ public class Voxel
 {
     public static readonly float[] White = new float[] { 0.99f, 0.99f, 0.99f };
     public static readonly int VertSize = 9;
+    public static readonly int VertCount = 36;
 
     public int X;
     public int Y;
@@ -49,8 +50,8 @@ public class Voxel
 
     public float[] ToVerts() {
         var source = Cube.VertsNormals;
-        var result = new float[324]; // 2 3-angles for each of 6 faces of cube
-        for (int i=0; i<36; i++) {
+        var result = new float[VertSize * VertCount];
+        for (int i=0; i<VertCount; i++) {
             result[i*9+0] = source[i*6+0] + this.X;
             result[i*9+1] = source[i*6+1] + this.Y;
             result[i*9+2] = source[i*6+2] + this.Z;

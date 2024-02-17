@@ -5,5 +5,14 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="OpenTK" Version="4.8.2" />
+    <Content Include="src-pbm/*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="src-shader/*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="src-config/*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project> 
