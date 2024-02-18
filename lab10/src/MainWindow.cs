@@ -13,25 +13,19 @@ public class MainWindow : GameWindow
 {
     private MyConfig myConfig;
 
-    // These are the handles to OpenGL objects.
-    private int VBO;
-    private int shapeVAO;
+    private RasterGlyphMap glyphMap;
+
+    private Observer camera, observer;
+    private Vector2? lastPos = null;
+
+    private Voxel[] shapes;
 
     private float[] allVerts;
 
-    private float ambientLightStrength = 0.6f;
-    private Vector3 lightPos = new Vector3(1f, 4f, 40f);
-    private Vector3 cameraPos = new Vector3(12f, 11f, 16f);
-    private float cameraYaw = -124, cameraPitch = -28; // in degrees
-
+    // handles to OpenGL objects
+    private int VBO;
+    private int shapeVAO;
     private Shader phongShader;
-
-    private Observer camera, observer;
-
-    const float cameraSpeed = 2.7f;
-    const float sensitivity = 0.043f;
-
-    private Vector2? lastPos = null;
 
     public MainWindow (
         GameWindowSettings gameWindowSettings, 
@@ -42,36 +36,74 @@ public class MainWindow : GameWindow
         myConfig = config;
     }
 
-    // Now, we start initializing OpenGL.
-    protected override void OnLoad()
+    public static MainWindow Create (MyConfig config) 
     {
-        base.OnLoad();
-
-        observer = new Observer(cameraPos, Size.X / (float)Size.Y) { Yaw = cameraYaw };
-        camera = new Observer(cameraPos, Size.X / (float)Size.Y) { Pitch = cameraPitch, Yaw = cameraYaw };
-
-        GL.ClearColor(0.12f, 0.13f, 0.16f, 1.0f);
-        GL.Enable(EnableCap.DepthTest);
-
-        var digitRasters = PbmOneParser.File("./src-pbm/digits.pbm").Parse();
-        var digitMapBuilder = new RasterGlyphBuilder() {
-            Rasters = digitRasters, // the raster
-            GlyphHeight = 12, // how many rows in one glyph
-            Chars = new char[] { 
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' 
-            } // the chars represented with that raster
+        var nativeSettings = new NativeWindowSettings() {
+            ClientSize = new Vector2i(config.Window.Width, config.Window.Height),
+            Title = config.Window.Title,
+            Flags = ContextFlags.ForwardCompatible
         };
 
-        var digitMap = digitMapBuilder.Build();
+        return new MainWindow(GameWindowSettings.Default, nativeSettings, config);
+    }
 
-        Voxel[] shapes = (new Voxel[][] {
-            digitMap['2'].Color(0.4f, 0.5f, 0.88f).ToVoxels(-20, 4, -3),
-            digitMap['0'].Color(0.5f, 0.5f, 0.8f).ToVoxels(-12, 4, -3),
-            digitMap['2'].Color(0.6f, 0.5f, 0.63f).ToVoxels(-4, 4, -3),
-            digitMap['4'].Color(0.72f, 0.5f, 0.54f).ToVoxels(4, 4, -3),
-        }).SelectMany(item => item).ToArray();
+    protected void InitGlyphSources() 
+    {
+        this.glyphMap = new RasterGlyphMap();
 
-        allVerts = new float[Voxel.VertSize*shapes.Length*Voxel.VertCount]; // this fixed size buffer is gonna backfire.
+        foreach (var source in myConfig.GlyphSources) {
+            var fileParser = ImageParser.BooleanFormatParser(source.Format);
+            if (fileParser == null) {
+                throw new Exception("Image format not supported");
+            }
+            var rasters = fileParser(source.Source).Parse();
+            var mapBuilder = new RasterGlyphBuilder() {
+                Rasters = rasters, // the raster
+                GlyphHeight = source.GlyphHeight, // how many rows in one glyph
+                Chars = source.Chars.Select(item => item[0]).ToList()
+            };
+            this.glyphMap = this.glyphMap + mapBuilder.Build();
+        }
+    }
+
+    protected void InitScene()
+    {
+        var cameraConfig = myConfig.Camera;
+        var cameraPos = ToVector3(cameraConfig.Position);
+
+        observer = new Observer(cameraPos, Size.X / (float)Size.Y) { 
+            Yaw = cameraConfig.Yaw 
+        };
+        camera = new Observer(cameraPos, Size.X / (float)Size.Y) { 
+            Pitch = cameraConfig.Pitch, 
+            Yaw = cameraConfig.Yaw, 
+            Fov = cameraConfig.Fov,
+            Near = cameraConfig.Near,
+            Far = cameraConfig.Far
+        };
+
+        var backColor = myConfig.Scene.BackgroundColor;
+        GL.ClearColor(backColor[0], backColor[1], backColor[2], 1.0f);
+
+        var voxels = new List<Voxel>(1024);
+
+        foreach (var textSpan in myConfig.Text) {
+            int[] pos = textSpan.Position;
+            float[] color = textSpan.Color;
+            int x = pos[0], y = pos[1], z = pos[2];
+            foreach (char c in textSpan.Text) {
+                var glyph = this.glyphMap[c];
+                voxels.AddRange(glyph.Color(color).ToVoxels(x, y, z));
+                x += glyph.Width;
+            }
+        }
+
+        this.shapes = voxels.ToArray();
+    }
+
+    protected void InitVBO()
+    {
+        allVerts = new float[Voxel.VertSize*shapes.Length*Voxel.VertCount];
         int allVertsIdx = 0;
         foreach (var shape in shapes) {
             var verts = shape.ToVerts();
@@ -81,8 +113,12 @@ public class MainWindow : GameWindow
 
         this.VBO = GL.GenBuffer();
         GL.BindBuffer(BufferTarget.ArrayBuffer, this.VBO);
-
         GL.BufferData(BufferTarget.ArrayBuffer, allVerts.Length * sizeof(float), allVerts, BufferUsageHint.StaticDraw);
+    }
+
+    protected void InitRendering() 
+    {
+        GL.Enable(EnableCap.DepthTest);
 
         phongShader = new Shader (
             File.ReadAllText("./src-shader/shader.vert"), 
@@ -103,13 +139,20 @@ public class MainWindow : GameWindow
         var aColor = phongShader.GetAttribLocation("aColor");
         GL.EnableVertexAttribArray(aColor);
         GL.VertexAttribPointer(aColor, 3, VertexAttribPointerType.Float, false, 9*sizeof(float), 6*sizeof(float));
-
-        CursorState = CursorState.Grabbed;
-
-        // Setup is now complete! Now we move to the OnRenderFrame function to finally draw the triangle.
     }
 
-    // Now that initialization is done, let's create our render loop.
+    protected override void OnLoad()
+    {
+        base.OnLoad();
+
+        this.InitGlyphSources();
+        this.InitScene();
+        this.InitVBO();
+        this.InitRendering();
+
+        CursorState = CursorState.Grabbed;
+    }
+
     protected override void OnRenderFrame(FrameEventArgs e)
     {
         base.OnRenderFrame(e);
@@ -122,18 +165,16 @@ public class MainWindow : GameWindow
 
         phongShader.Use();
         phongShader.SetMatrix4("model", Matrix4.Identity);
+        phongShader.SetVector3("viewPos", camera.Position);
         phongShader.SetMatrix4("view", camera.GetViewMatrix());
         phongShader.SetMatrix4("projection", camera.GetProjectionMatrix());
-        phongShader.SetFloat("ambientLightStrength", ambientLightStrength);
+        phongShader.SetVector3("lightPos", ToVector3(myConfig.Scene.AmbientLightPosition));
         phongShader.SetVector3("lightColor", new Vector3(1.0f, 1.0f, 1.0f));
-        phongShader.SetVector3("lightPos", lightPos);
-        phongShader.SetVector3("viewPos", camera.Position);
+        phongShader.SetFloat("ambientLightStrength", myConfig.Scene.AmbientLightStrength);
 
         GL.DrawArrays(PrimitiveType.Triangles, 0, allVerts.Length / Voxel.VertSize);
 
         SwapBuffers();
-
-        // And that's all you have to do for rendering! You should now see a yellow triangle on a black screen.
     }
 
     protected override void OnUpdateFrame(FrameEventArgs e)
@@ -143,6 +184,10 @@ public class MainWindow : GameWindow
         if (!IsFocused) {
             return;
         }
+
+        var moveSpeed = myConfig.Camera.MoveSpeed;
+        var rotateSpeed = myConfig.Camera.RotateSpeed;
+        var sensitivity = myConfig.Camera.MouseSensitivity;
 
         var input = this.KeyboardState;
 
@@ -154,28 +199,28 @@ public class MainWindow : GameWindow
         }
 
         if (input.IsKeyDown(Keys.W)) {
-            observer.Position += observer.Front * cameraSpeed * (float)e.Time; // Forward
+            observer.Position += observer.Front * moveSpeed * (float)e.Time; // Forward
         }
         if (input.IsKeyDown(Keys.S)) {
-            observer.Position -= observer.Front * cameraSpeed * (float)e.Time; // Forward
+            observer.Position -= observer.Front * moveSpeed * (float)e.Time; // Forward
         }
         if (input.IsKeyDown(Keys.A)) {
-            observer.Position -= observer.Right * cameraSpeed * (float)e.Time; // Left
+            observer.Position -= observer.Right * moveSpeed * (float)e.Time; // Left
         }
         if (input.IsKeyDown(Keys.D)) {
-            observer.Position += observer.Right * cameraSpeed * (float)e.Time; // Right
+            observer.Position += observer.Right * moveSpeed * (float)e.Time; // Right
         }
         if (input.IsKeyDown(Keys.Q)) {
-            observer.Yaw -= 7 * cameraSpeed * (float)e.Time;
+            observer.Yaw -= rotateSpeed * (float)e.Time;
         }
         if (input.IsKeyDown(Keys.E)) {
-            observer.Yaw += 7 * cameraSpeed * (float)e.Time;
+            observer.Yaw += rotateSpeed * (float)e.Time;
         }
         if (input.IsKeyDown(Keys.LeftShift)) {
-            observer.Position += observer.Up * cameraSpeed * (float)e.Time; // Up
+            observer.Position += observer.Up * moveSpeed * (float)e.Time; // Up
         }
         if (input.IsKeyDown(Keys.LeftControl)) {
-            observer.Position -= observer.Up * cameraSpeed * (float)e.Time; // Down
+            observer.Position -= observer.Up * moveSpeed * (float)e.Time; // Down
         }
 
         camera.Position = observer.Position;
@@ -220,17 +265,23 @@ public class MainWindow : GameWindow
 
     protected override void OnUnload()
     {
-        // Unbind all the resources by binding the targets to 0/null.
+        // Unbind all the resources by binding the targets to 0/null
         GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         GL.BindVertexArray(0);
         GL.UseProgram(0);
 
-        // Delete all the resources.
+        // Delete all the resources
         GL.DeleteBuffer(this.VBO);
-        GL.DeleteVertexArray(shapeVAO);
+        GL.DeleteVertexArray(this.shapeVAO);
 
-        GL.DeleteProgram(phongShader.Handle);
+        GL.DeleteProgram(this.phongShader.Handle);
 
         base.OnUnload();
     }
+
+    public static Vector3 ToVector3 (float[] source) 
+    {
+        return new Vector3(source[0], source[1], source[2]);
+    }
+
 }

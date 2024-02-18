@@ -5,7 +5,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-public class PbmOneParser : PbmParser<bool>
+public class PbmOneParser : IImageParser<bool>
 {
     public int Width { get; set; }
     public int Height { get; set; }

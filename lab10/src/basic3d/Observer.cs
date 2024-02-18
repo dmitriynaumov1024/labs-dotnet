@@ -78,6 +78,9 @@ public class Observer
         }
     }
 
+    public float Near { get; set; }
+    public float Far { get; set; }
+
     // Get the view matrix using the amazing LookAt function described more in depth on the web tutorials
     public Matrix4 GetViewMatrix()
     {
@@ -87,7 +90,7 @@ public class Observer
     // Get the projection matrix using the same method we have used up until this point
     public Matrix4 GetProjectionMatrix()
     {
-        return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.01f, 100f);
+        return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, this.Near, this.Far);
     }
 
     // This function is going to update the direction vertices using some of the math learned in the web tutorials.

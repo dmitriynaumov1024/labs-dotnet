@@ -1,0 +1,53 @@
+{
+    "Window": {
+        "Height": 540,
+        "Width": 800,
+        "Title": "Lab 10 by Dmytro Naumov"
+    },
+    "GlyphSources": [
+        {
+            "Format": "P1",
+            "Source": "./src-pbm/digits.pbm",
+            "Chars": [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" ],
+            "GlyphHeight": 12
+        }
+    ],
+    "Scene": {
+        "BackgroundColor": [ 0.12, 0.13, 0.17 ],
+        "AmbientLightPosition": [ 1, 2, 20 ],
+        "AmbientLightStrength":  0.5
+    },
+    "Camera": {
+        "Position": [ 30, 28, 50 ],
+        "Fov": 50,
+        "Near": 0.05,
+        "Far": 500,
+        "Pitch": -24,
+        "Yaw": -125,
+        "MoveSpeed": 5,
+        "RotateSpeed": 13,
+        "MouseSensitivity": 0.04,
+    },
+    "Text": [
+        {
+            "Text": "18",
+            "Color": [ 0.4, 0.5, 0.88 ],
+            "Position": [ -36, 4, -1 ],
+        },
+        {
+            "Text": "02",
+            "Color": [ 0.46, 0.5, 0.81 ],
+            "Position": [ -12, 4, -1 ]
+        },
+        {
+            "Text": "2024",
+            "Color": [ 0.55, 0.5, 0.72 ],
+            "Position": [ 12, 4, -1 ]
+        },
+        {
+            "Text": "9876543210",
+            "Color": [ 0.45, 0.76, 0.51 ],
+            "Position": [ -36, -12, -1 ]
+        },
+    ]
+}

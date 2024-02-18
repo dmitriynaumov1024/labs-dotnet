@@ -8,6 +8,9 @@ public class RasterGlyph
 {
     public bool[][] Raster { get; set; }
 
+    public int Width => this.Raster[0].Length;
+    public int Height => this.Raster.Length;
+
     public float[] ColorRGB { get; set; } = Voxel.White;
 
     public RasterGlyph Color (float r, float g, float b) 
@@ -15,6 +18,14 @@ public class RasterGlyph
         return new RasterGlyph () { 
             Raster = this.Raster,
             ColorRGB = new float[] { r, g, b }
+        };
+    }
+
+    public RasterGlyph Color (float[] rgb) 
+    {
+        return new RasterGlyph () { 
+            Raster = this.Raster,
+            ColorRGB = rgb
         };
     }
 
