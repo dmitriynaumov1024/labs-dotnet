@@ -1,0 +1,8 @@
+Movie repository
+
+Movie
++ id
++ name
++ genre
++ author
++ releasedAt
