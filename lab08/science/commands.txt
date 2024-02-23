@@ -1,0 +1,22 @@
+Movie repo commands / functions
+
+# add data from a csv file
++ seed <filename>
+
+# add one record, interactive
++ add 
+
+# edit one record, interactive
++ edit <id>
+
+# remove record by id
++ remove <id>
+
+# find records by id|name|author|year|genre
++ find id|name|author|year|genre <value>
+
+# go to next page, if supported by command
++ next
+
+# go to previous page, if supported by command
++ prev

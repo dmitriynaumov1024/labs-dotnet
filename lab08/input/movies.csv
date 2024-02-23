@@ -1,0 +1,16 @@
+# this is a comment
+#
+id;name;duration;genre;author;released_at
+#
+# this is another comment
+#
+1;The Hidden Enigma;135;Mystery;Alexandra Nolan;2019-07-15
+2;Ephemeral Echoes;120;Drama;Jonathan Anderson;2018-04-23
+3;Quantum Odyssey;150;Sci-Fi;Emily Rodriguez;2020-11-05
+4;Whispers in the Shadows;110;Thriller;Michael Turner;2017-09-12
+5;Serendipity's Embrace;95;Romance;Olivia Mitchell;2021-03-28
+6;Rogue Pursuit;125;Action;Daniel Harper;2016-08-09
+7;Chronicles of Destiny;140;Fantasy;Sophia Simmons;2022-01-19
+8;Abyssal Silence;115;Horror;Ryan Foster;2015-06-30
+9;Timeless Reverie;105;Adventure;Isaac Parker;2019-12-10
+10;Whimsical Harmony;130;Comedy;Hannah White;2023-05-08
