@@ -1,0 +1,19 @@
+# Tetrahedron FE interpolation of scalar values
+
+# [points] is a list of 3d point coords and measurement values 
+# [points] format: <x> <y> <z> <value>
+
+[points]
+-1.0    0.0     -2.0    24.1
+-1.0    0.0     2.0     15.2
+2.0     0.5     0.0     17.3
+0.25    4.0     0.17    -4.4
+-2.0    2.0     0.15    11.2
+
+# [shapes] is a list of tetrahedron vert indices
+# [shapes] tetrahedron usually consists of 4 verts
+# [shapes] format: <a index> <b index> <c index> <d index>
+
+[shapes] 
+0       1       2       3
+0       1       4       3
