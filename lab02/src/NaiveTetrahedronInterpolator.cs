@@ -7,6 +7,8 @@ using System.Linq;
 // returns value at closest vert to given point
 class NaiveTetrahedronInterpolator : TetrahedronInterpolator
 {
+    static double Eps = 1e-9;
+
     public NaiveTetrahedronInterpolator (Point[] verts, double[] values)
     {
         this.Verts = verts;
@@ -18,9 +20,11 @@ class NaiveTetrahedronInterpolator : TetrahedronInterpolator
     public override double GetValueAt (Point p) 
     {
         double D = 0, result = 0;
-        double[] ds = new double[VertCount];
+        Span<double> ds = stackalloc double[VertCount];
         for (int i=0; i<VertCount; i+=1) {
-            ds[i] = 1.0 / this.GetSquaredDistance(i, p);
+            double d = this.GetSquaredDistance(i, p);
+            if (Math.Abs(d) < Eps) return this.Values[i];
+            ds[i] = 1 / d;
             D += ds[i];
         }
         for (int i=0; i<VertCount; i+=1) {
