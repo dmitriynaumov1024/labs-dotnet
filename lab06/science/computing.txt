@@ -1,0 +1,21 @@
+Compute on a thread
+
+function:
+S(n) = sum f(i) for i = [0...n] 
+f(i) = i^2 / (1 + i^4)
+
+main program input:
+- n: Int64 # i limit
+- threads: Int32 [1...16] # thread count
+
+main program output:
+- sum: Double # sum
+- time: Int32 # elapsed time in seconds
+
+sub program input:
+- n: Int64 # i limit
+- i0: Int64 # i start
+- step: Int64 # i step
+
+sub program output:
+- sum: Double # sum
