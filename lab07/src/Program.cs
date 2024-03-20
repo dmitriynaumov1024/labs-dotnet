@@ -8,8 +8,6 @@ using System.Text;
 
 public class Program
 {
-    // виконав Наумов Дмитро Павлович, гр.8.1213
-
     static readonly string usage = "Usage: <text> <directory> <filename patterns>";
     static readonly EnumerationOptions enumOptions = new() {
         RecurseSubdirectories = true
@@ -17,7 +15,7 @@ public class Program
 
     public static void Main (string[] args)
     {
-        // Console.WriteLine("Наумов Дмитро Павлович, гр.8.1213");
+        Console.WriteLine("Наумов Дмитро Павлович, гр.8.1213");
 
         string text = null;
         string directory = null;
