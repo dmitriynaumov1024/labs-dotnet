@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 public class Program
@@ -27,23 +28,27 @@ public class Program
             return;
         }
 
+        // ThreadPool.SetMaxThreads(11, 1);
+
         Console.WriteLine($"- N: {N}");
         Console.WriteLine($"- Threads: {Threads}");
         
         var subPrograms = Enumerable.Range(0, Threads)
             .Select(i => new SubProgram(N, i, Threads))
-            .ToList();
+            .ToArray();
 
         var timer = Stopwatch.StartNew();
-
-        var tasks = subPrograms
-            .Select<SubProgram, Action>(p => (() => p.Run(timer)))
-            .ToArray();
-        Parallel.Invoke(tasks);
-
-        timer.Stop();
+        
+        var threads = new Task[Threads];
 
         for (Int32 i=0; i<Threads; i++) {
+            var prog = subPrograms[i];
+            threads[i] = new Task(()=> prog.Run(timer));
+            threads[i].Start();
+        }
+
+        for (Int32 i=0; i<Threads; i++) {
+            threads[i].Wait();
             Console.WriteLine($"- Time[{i}]: {subPrograms[i].Time}ms");
         }
 

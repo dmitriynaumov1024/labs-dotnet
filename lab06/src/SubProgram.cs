@@ -21,7 +21,8 @@ public class SubProgram
 
     public Double F (Double i)
     {
-        return Math.Pow(i, 2) / (1.0 + Math.Pow(i, 4));
+        double i2 = i*i, i4 = i2*i2;
+        return i2 / (1.0 + i4);
     }
 
     public void Run (Stopwatch timer)
