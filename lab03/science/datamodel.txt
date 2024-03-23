@@ -1,0 +1,39 @@
+type Point
++ x: double
++ y: double
++ z: double
++ getDistance(p: Point): double
++ getSquaredDistance(p: Point): double
+
+type ValuedPoint extends Point
+// inherited x, y, z
++ value: double
+
+type Shape<TPoint> where TPoint: Point
++ verts: List<TPoint>
++ vertCount: int
++ getNearest(p: Point): TPoint
+
+type Interpolator
++ shape: Shape<ValuedPoint>
++ abstract build(): void
++ abstract getValueAt(p: Point): double
+
+type InterpolatorArray 
++ interpolators: List<Interpolator>
++ getNearest(p: Point): Interpolator
++ getValueAt(p: Point): double
+
+// can be used with any shape
+type ProximityInterpolator extends Interpolator
++ override build(): void
++ override getValueAt(p: Point): double
+
+// can be used with any shape
+type NaiveInterpolator extends Interpolator
++ override build(): void
++ override getValueAt(p: Point): double
+
+type TetrahedronClassicInterpolator extends Interpolator
++ override build(): void
++ override getValueAt(p: Point): double
