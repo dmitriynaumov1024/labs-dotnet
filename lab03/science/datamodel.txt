@@ -37,3 +37,39 @@ type NaiveInterpolator extends Interpolator
 type TetrahedronClassicInterpolator extends Interpolator
 + override build(): void
 + override getValueAt(p: Point): double
+
+type InterpolatorFactory: (Shape<ValuedPoint>)-> Interpolator
+
+type InterpolatorTest
++ points: List<ValuedPoint>
++ shapes: List<Shape<ValuedPoint>>
++ targets: List<Point>
++ result: Dictionary<string, List<ValuedPoint>>
++ run(factory: InterpolatorFactory): string
++ toFile(filename: string): void
++ toPythonFile(filename: string): void
++ static fromFile(filename: string): InterpolatorTest
+
+format Native
+# comment
+[points]
+x:double y:double z:double value:double
+...
+[shapes]
+i:double ...
+...
+[targets]
+x:double y:double z:double
+...
+[result.<InterpolatorType>]
+x:double y:double z:double value:double
+...
+
+format Python
+# comment
+Sizes = [size:int...]
+X = [x:double...]
+Y = [y:double...]
+Z = [z:double...]
+Result<InterpolatorType> = [value:double...]
+...

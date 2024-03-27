@@ -15,7 +15,7 @@ public class TetrahedronClassicInterpolator : Interpolator
 
     public override Interpolator Build()
     {
-        int N = this.Shape.VertCount;
+        int N = 4;
         List<ValuedPoint> P = this.Shape.Verts;
 
         this.C = new double[N, N];

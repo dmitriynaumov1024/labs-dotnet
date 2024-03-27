@@ -3,7 +3,7 @@ using System;
 
 public class Gauss
 {
-    static double Eps = 1e-8;
+    static double Eps = 1e-10;
 
     public static double[] Solve (double[,] M, double[] result = null)
     {
@@ -17,6 +17,17 @@ public class Gauss
 
         // liquidation of lower triangle
         for (int j=0; j<cols-2; j++) {
+            // fix zeros on main diagonal
+            if (Math.Abs(matrix[j, j]) < Eps) {
+                for (int k=j+1; k<rows; k++) {
+                    if (Math.Abs(matrix[k, j]) > Eps) {
+                        // fix it by swapping j-th row with first k-th row 
+                        // where k > j and matrix[k, j] != 0
+                        Swap(matrix, j, k);
+                        break;
+                    }
+                }
+            }
             for (int i=j+1; i<rows; i++) {
                 if (Math.Abs(matrix[i, j]) > Eps) {
                     // matrix[i, j] - target element
@@ -47,5 +58,15 @@ public class Gauss
         }
         // The end
         return result;
+    }
+
+    public static void Swap (double[,] M, int row1, int row2)
+    {
+        int cols = M.GetLength(1);
+        for (int i=0; i<cols; i++) {
+            double tmp = M[row1, i];
+            M[row1, i] = M[row2, i];
+            M[row2, i] = tmp;
+        }
     }
 }
