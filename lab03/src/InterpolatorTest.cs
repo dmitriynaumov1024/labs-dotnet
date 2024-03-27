@@ -17,6 +17,9 @@ public class InterpolatorTest
         InterpolatorArray it = new InterpolatorArray(){ 
             Interpolators = this.Shapes.Select(factory).ToList() 
         };
+        if (it.Interpolators.Count < 1) {
+            throw new EmptyListException("InterpolatorArray should contain at least 1 interpolator");
+        }
         string name = it.Interpolators[0].GetType().Name;
         List<ValuedPoint> result = this.Points.ToList();
         foreach (var p in this.Targets) {

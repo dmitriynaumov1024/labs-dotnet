@@ -42,14 +42,6 @@ public class Program
             return;
         }
 
-        testCase.Targets = new();
-        for (int x=-8; x<10; x+=2) {
-            for (int y=-8; y<10; y+=2) {
-                int z = 0;
-                testCase.Targets.Add(new Point(x, y, z));
-            }
-        }
-
         foreach (var factory in itFactories) {
             try {
                 testCase.Run(factory);
