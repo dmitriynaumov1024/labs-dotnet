@@ -14,6 +14,12 @@ public class InterpolatorArray
 
     public Interpolator GetNearest (Point p)
     {
+        if (this.Interpolators.Count < 1) {
+            throw new EmptyListException("InterpolatorArray should contain at least 1 interpolator");
+        }
+        if (this.Interpolators.Count == 1) {
+            return this.Interpolators[0];
+        }
         return this.Interpolators.MinBy (
             it => it.Shape.Verts.Sum (
                 v => v.GetDistance(p)

@@ -36,7 +36,9 @@ public class InterpolatorTest
         result.Targets = new();
         result.Result = new(); 
         string currentMode = null;
+        int i = 0;
         while (true) {
+            i++;
             string line = reader.ReadLine()?.TrimStart();
             if (line == null) {
                 break;
@@ -49,6 +51,9 @@ public class InterpolatorTest
             }
             else if (currentMode == "[points]") {
                 string[] words = line.Split(separators, splitOpts);
+                if (words.Length < 4) {
+                    throw new InputFormatException(i, "ValuedPoint expects 4 numbers (x, y, z, value)");
+                }
                 result.Points.Add (
                     new ValuedPoint (
                         double.Parse(words[0]),
@@ -60,6 +65,9 @@ public class InterpolatorTest
             }
             else if (currentMode == "[shapes]") {
                 string[] words = line.Split(separators, splitOpts);
+                if (words.Length < 3) {
+                    throw new InputFormatException(i, "Shape expects at least 3 verts");
+                }
                 result.Shapes.Add (
                     new Shape<ValuedPoint>(
                         words.Select(int.Parse)
@@ -69,6 +77,9 @@ public class InterpolatorTest
             }
             else if (currentMode == "[targets]") {
                 string[] words = line.Split(separators, splitOpts);
+                if (words.Length < 3) {
+                    throw new InputFormatException(i, "Point expects at least 3 numbers (x, y, z)");
+                }
                 result.Targets.Add (
                     new Point (
                         double.Parse(words[0]),

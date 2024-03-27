@@ -33,6 +33,10 @@ public class Program
             var reader = new StreamReader(File.OpenRead(inputPath));
             testCase = InterpolatorTest.FromFile(reader);
         }
+        catch (InputFormatException ex) {
+            Console.WriteLine("[x] {0}: {1}: {2}", ex.GetType().Name, inputPath, ex.Message);
+            return;
+        }
         catch (Exception ex) {
             Console.WriteLine("[x] {0}: {1}", ex.GetType().Name, ex.Message);
             return;
